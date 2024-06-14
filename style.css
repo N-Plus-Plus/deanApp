@@ -1,0 +1,180 @@
+:root{
+    --numeric: 'Cutive Mono', monospace;
+    --text: 'Lexend Deca', sans-serif;
+
+    --lgrey: #F5F7FA;
+    --mgrey: #CCD1D9;
+    --dgrey: #656D78;
+    --charcoal: #3C3B3D;
+    --invis: #0000;
+    
+    --red: #FF4E4E;
+    --black: #1e1d1e;
+    --overspend: #0009;
+    --green: #007C00;
+    --lGreen: #42B200;
+    --bg: #FFF;
+    --lBg: #656D78;
+    --loading: #656D78;
+}
+
+body{
+    background-color: var(--charcoal);
+    color: var(--lgrey);
+    margin: 0;
+    font-family: var(--text);
+    overflow: auto;
+    position: relative;
+    user-select: none;
+    margin: 0px;
+    padding: 0px;
+    overflow-x: hidden;
+    width: 100%;
+    height: 100%;
+}
+
+*,*::before{
+    box-sizing: border-box;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: contain;
+}
+
+.noDisplay{ display: none; }
+.modalShade.noDisplay{ display: none; }
+
+main{ width: 100%; height: 100%; display: flex; flex-wrap:wrap; overflow-y: auto;}
+
+.bar .segment{ font-size: 1.75em;}
+.bar{ width: 100%; height: 4em; padding: 0.5em; display: flex; overflow: hidden; background-color: var(--black); justify-content: space-between; align-items: center; }
+.middle{ width: 100%; height: calc( 100% - 9.5rem ); display: flex; overflow-y: auto; position: relative; }
+.segment{ width: 30%; height: 100%; display: flex; align-items: center; justify-content: center;}
+
+.green, .red, .white, .grey {font-family: var( --numeric ); font-weight: 900; }
+.green{ color: var( --lGreen ); }
+.red{ color: var( --red ); }
+.white{ color: var( --lgrey ); }
+.grey{ color: var( --dgrey ); }
+
+.mainButton{ width: 2rem; height: 2rem; }
+#bottomButtons{ justify-content: space-around;}
+#addSalary{ background-image: url(./img/addSalary.png);}
+#addExpense{ background-image: url(./img/addExpense.png);}
+#envelopes{ background-image: url(./img/envelopes.png);}
+#endMonth{ background-image: url(./img/endMonth.png);}
+.add{ background-image: url(./img/add.png); width: 2rem; height: 2rem; cursor: pointer; }
+
+.modalShade{ width: 100%; height: 100%; background-color: #000c; display: flex; align-items: center; justify-content: center; position: absolute; top: 0; left: 0; z-index: 100;}
+.modal{ background-color: var(--black); width: 80%; padding: 1em; font-size: 1.5rem; position: relative;}
+.buttonBox, .inputGroup{ width: 100%; height: 4em; display: flex; align-items: center; justify-content: space-between; }
+.button{ background-color: var(--charcoal); padding: 1em; min-width: 33%; display: flex; align-items: center; justify-content: center;}
+.textButton{ height: 3.5rem; border-radius: 5px; cursor: pointer;}
+
+.middle{
+    padding: 1em;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    flex-direction: column;
+}
+
+.row{ width: 100%; height: 2.5em; display: flex; align-items: center; margin-bottom: 0.5em;}
+.env{ background-image: url(./img/envelope.png); min-width: 1.5em; height: 1.5em; margin-right: 0.75em;}
+.title{ font-family: var(--text); min-width: 6em; font-size: 1.25rem;}
+.transfer{ background-image: url(./img/transfer.png); min-width: 2em; height: 2em; margin-left: 0.5em; cursor: pointer;}
+.void{ background-image: none; min-width: 2.5em; height: 2em; margin-left: 0.5;}
+
+.progress{ width: 100%; height: 0.125em; display: flex; align-items: flex-start; justify-content: center; }
+.progress{ position: relative; margin-bottom: 2em; background-color: var(--lgrey);}
+.spent{ position: absolute; top: 0; left: 0; height: 100%; background-color: var(--red);}
+.overspend{ position: absolute; top: 0; right: 0; height: 100%; background-color: var(--overspend);}
+
+.row .segment{ justify-content: flex-end; padding-right: 1em; font-size: 1.5rem;}
+.bottomChunk{ display: flex; flex-direction: column; justify-content: space-between; cursor: pointer;}
+.bottomChunk * { pointer-events: none; }
+.text{ font-size: 1rem; }
+
+#bottomButtons{ height: 5.5em; padding: 0.75em;}
+
+.title1{ font-family: var(--text); font-weight: 600; font-size: 1.25rem; min-width: 6em;}
+.row .segment.title1{ justify-content: flex-end; padding-right: 1.25em; font-size: 1.25rem;}
+
+#envelopeBody{ width: 100%; }
+
+.closeModal{ cursor: pointer; width: 1.25rem; height: 1.25rem; background-image: url(./img/close.png); position: absolute; top: -2rem; right: -2rem; }
+
+.vertBox{ width: 50%; display: flex; flex-direction: column;}
+.modalLabel{ margin-bottom: 1rem; }
+
+
+input {
+    border: 2px solid #333;
+    border-radius: 5px;
+    color: #333;
+    font-size: 32px;
+    padding: .5rem 1rem;
+    width: 50%;
+  }
+
+
+
+  /* The switch - the box around the slider */
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 60px;
+    height: 34px;
+  }
+  
+  /* Hide default HTML checkbox */
+  .switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+  }
+  
+  /* The slider */
+  .slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    transition: .4s;
+    border-radius: 34px;
+  }
+  
+  .slider:before {
+    position: absolute;
+    content: "";
+    height: 26px;
+    width: 26px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    transition: .4s;
+    border-radius: 50%;
+  }
+  
+  /* When the checkbox is checked */
+  input:checked + .slider {
+    background-color: #2196F3;
+  }
+  
+  /* Move the slider when the checkbox is checked */
+  input:checked + .slider:before {
+    transform: translateX(26px);
+  }
+
+select {
+    width: 95%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background-color: #fff;
+    font-size: 16px;
+    margin-bottom: 2rem;
+    transition: border-color 0.3s ease;
+}
