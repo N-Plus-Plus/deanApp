@@ -18,6 +18,8 @@
     --loading: #656D78;
 }
 
+html{  font-size: 16px; /* Default base font size */ }
+
 body{
     background-color: var(--charcoal);
     color: var(--lgrey);
