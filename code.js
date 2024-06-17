@@ -9,7 +9,6 @@ function onLoad(){
 function clicked( e ){
     let f = e.target.getAttribute( "data-function" );
     if( f == `toggleModal` ){ toggleModal(); }
-    if( f == `commitStartFunds` ){ commitStartFunds( document.getElementById("startFunds").value  ); }
     if( f == `addSalary` ){ buildModal( `addSalary` ); toggleModal(); }
     if( f == `addIncome` ){ addIncome( document.getElementById("addSalary").value, document.getElementById("incomeTitle").value ); }
     if( f == `transferFunds` ){ buildModal( `transferFunds` ); toggleModal(); temp.from = e.target.getAttribute( `data-discriminator` ); }
@@ -22,7 +21,7 @@ function clicked( e ){
 }
 
 var fund = {
-    past: 59250,
+    past: 0,
     income: 0,
     incomeDeets: [],
     spent: 0
@@ -42,12 +41,6 @@ var temp = { from: `envelope0`, to: `envelope0` }
 
 function updateFrom(){ temp.from = document.getElementById(`fromEnv`).value; }
 function updateTo(){ temp.to = document.getElementById(`toEnv`).value; }
-
-function commitStartFunds( x ){
-    fund.past = x;
-    updateDisplay();
-    closeModal();
-}
 
 function addEnvelope( name ){
     env[`envelope` + Object.keys( env ).length] = {
@@ -176,19 +169,7 @@ function updateIncomes(){
 
 function buildModal( content ){
     let t = document.getElementById(`modal`);
-    if( content == `firstLaunch` ){
-        t.innerHTML = `
-            <div class="closeModal" data-function="toggleModal"></div>
-            Hey there!<p>
-            Because this is the first time you're launching this web app, before we get to salary and expenses, please enter the amount of past savings below.<p>
-            This will appear as Rollover Income and appear in your Unallocated bucket to get things started.<p>
-            <div class="inputGroup">
-                <input type="text" name="currency-field" id="startFunds" value="" data-type="currency" placeholder="1,000,000.00">
-                <div class="button textButton" data-function="commitStartFunds">Commit</div>
-            </div>
-        `
-    }
-    else if( content == `addSalary` ){
+    if( content == `addSalary` ){
         t.innerHTML = `
             <div class="closeModal" data-function="toggleModal"></div>
             Enter the source and amount of the new Income into the boxes below.</p>
