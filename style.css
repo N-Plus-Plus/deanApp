@@ -18,7 +18,7 @@
     --loading: #656D78;
 }
 
-html{  font-size: 8px; /* Default base font size */ }
+html {  font-size: 12px; /* Default base font size */}
 
 body{
     background-color: var(--charcoal);
@@ -47,10 +47,11 @@ body{
 
 main{ width: 100%; height: 100%; display: flex; flex-wrap:wrap; overflow-y: auto;}
 
-.bar .segment{ font-size: 1.75em;}
-.bar{ width: 100%; height: 4em; padding: 0.5em; display: flex; overflow: hidden; background-color: var(--black); justify-content: space-between; align-items: center; }
-.middle{ width: 100%; height: calc( 100% - 9.5rem ); display: flex; overflow-y: auto; position: relative; }
+.bar .segment{ font-size: 2.5em;}
+.bar{ width: 100%; height: 8rem; padding: 0.5em; display: flex; overflow: hidden; background-color: var(--black); justify-content: space-between; align-items: center; }
+.middle{ width: 100%; height: calc( 100% - 16rem ); display: flex; overflow-y: auto; position: relative; }
 .segment{ width: 30%; height: 100%; display: flex; align-items: center; justify-content: center;}
+.rowSegment{ width: calc( ( 100% - 6rem - 2rem ) / 3 ); height: 100%; display: flex; align-items: center; justify-content: flex-end; }
 
 .green, .red, .white, .grey {font-family: var( --numeric ); font-weight: 900; }
 .green{ color: var( --lGreen ); }
@@ -58,19 +59,19 @@ main{ width: 100%; height: 100%; display: flex; flex-wrap:wrap; overflow-y: auto
 .white{ color: var( --lgrey ); }
 .grey{ color: var( --dgrey ); }
 
-.mainButton{ width: 2rem; height: 2rem; }
+.mainButton{ width: 4rem; height: 4rem; }
 #bottomButtons{ justify-content: space-around;}
 #addSalary{ background-image: url(./img/addSalary.png);}
 #addExpense{ background-image: url(./img/addExpense.png);}
 #envelopes{ background-image: url(./img/envelopes.png);}
 #endMonth{ background-image: url(./img/endMonth.png);}
-.add{ background-image: url(./img/add.png); width: 2rem; height: 2rem; cursor: pointer; }
+.add{ background-image: url(./img/add.png); width: 3rem; height: 3rem; cursor: pointer; }
 
 .modalShade{ width: 100%; height: 100%; background-color: #000c; display: flex; align-items: center; justify-content: center; position: absolute; top: 0; left: 0; z-index: 100;}
-.modal{ background-color: var(--black); width: 80%; padding: 1em; font-size: 1.5rem; position: relative;}
-.buttonBox, .inputGroup{ width: 100%; height: 4em; display: flex; align-items: center; justify-content: space-between; }
+.modal{ background-color: var(--black); width: 80%; padding: 1rem; font-size: 1.5rem; position: relative;}
+.buttonBox, .inputGroup{ width: 100%; height: 8rem; display: flex; align-items: center; justify-content: space-between; }
 .button{ background-color: var(--charcoal); padding: 1em; min-width: 33%; display: flex; align-items: center; justify-content: center;}
-.textButton{ height: 3.5rem; border-radius: 5px; cursor: pointer;}
+.textButton{ height: 3.5rem; border-radius: 0.125rem; cursor: pointer;}
 
 .middle{
     padding: 1em;
@@ -80,52 +81,58 @@ main{ width: 100%; height: 100%; display: flex; flex-wrap:wrap; overflow-y: auto
     flex-direction: column;
 }
 
-.row{ width: 100%; height: 2.5em; display: flex; align-items: center; margin-bottom: 0.5em;}
+.row{ width: 100%; height: 2em; display: flex; align-items: center; margin-bottom: 0.5em; font-size: 2rem;}
 .env{ background-image: url(./img/envelope.png); min-width: 1.5em; height: 1.5em; margin-right: 0.75em;}
-.title{ font-family: var(--text); min-width: 6em; font-size: 1.25rem;}
-.transfer{ background-image: url(./img/transfer.png); min-width: 2em; height: 2em; margin-left: 0.5em; cursor: pointer;}
-.void{ background-image: none; min-width: 2.5em; height: 2em; margin-left: 0.5;}
+.title{ font-family: var(--text); min-width: 6em; }
+.transfer{ background-image: url(./img/transfer.png); width: 2em; height: 2em; margin-left: 0.5em; cursor: pointer;}
+.void{ background-image: none; min-width: 2em; height: 2em; margin-left: 0.5rem;}
 
-.progress{ width: 100%; height: 0.125em; display: flex; align-items: flex-start; justify-content: center; }
+.progress{ width: 100%; height: 0.25em; display: flex; align-items: flex-start; justify-content: center; }
 .progress{ position: relative; margin-bottom: 2em; background-color: var(--lgrey);}
 .spent{ position: absolute; top: 0; left: 0; height: 100%; background-color: var(--red);}
 .overspend{ position: absolute; top: 0; right: 0; height: 100%; background-color: var(--overspend);}
 
-.row .segment{ justify-content: flex-end; padding-right: 1em; font-size: 1.5rem;}
+.row .segment{ justify-content: flex-end; padding-right: 1em; }
 .bottomChunk{ display: flex; flex-direction: column; justify-content: space-between; cursor: pointer;}
 .bottomChunk * { pointer-events: none; }
-.text{ font-size: 1rem; }
+.text{ font-size: 1.5rem; }
 
-#bottomButtons{ height: 5.5em; padding: 0.75em;}
+#bottomButtons{ height: 8rem; padding: 0.75rem;}
 
-.title1{ font-family: var(--text); font-weight: 600; font-size: 1.25rem; min-width: 6em;}
 .row .segment.title1{ justify-content: flex-end; padding-right: 1.25em; font-size: 1.25rem;}
 
 #envelopeBody{ width: 100%; }
+#incomeBody{ width: calc( 100% - 2rem ); position: absolute; left: 1rem; bottom: 1rem; font-size: 2rem;}
+.middleLabel{ font-size: 2.5rem; font-weight: 800; margin-bottom: 1rem;}
+.envLabel{ position: absolute; top: 1rem; left: 1rem; }
+.incomeLabel{ width: 50%; }
+.rightAlign{ text-align: right;}
+.incomeRow{ width: 100%; height: 2em; display: flex; align-items: center; padding-bottom: 0.5rem; border-bottom: solid 0.125rem #0003;}
 
 .closeModal{ cursor: pointer; width: 1.25rem; height: 1.25rem; background-image: url(./img/close.png); position: absolute; top: -2rem; right: -2rem; }
 
 .vertBox{ width: 50%; display: flex; flex-direction: column;}
 .modalLabel{ margin-bottom: 1rem; }
 
+.modal{ font-size: 2rem; }
 
 input {
-    border: 2px solid #333;
-    border-radius: 5px;
+    border-radius: 0.25rem;
     color: #333;
-    font-size: 32px;
+    font-size: 1.5rem;
     padding: .5rem 1rem;
-    width: 50%;
+    width: 47.5%;
   }
-
+  
+.hundo{ width: 100%; }
 
 
   /* The switch - the box around the slider */
 .switch {
     position: relative;
     display: inline-block;
-    width: 60px;
-    height: 34px;
+    width: 5rem;
+    height: 2.5rem;
   }
   
   /* Hide default HTML checkbox */
@@ -145,16 +152,16 @@ input {
     bottom: 0;
     background-color: #ccc;
     transition: .4s;
-    border-radius: 34px;
+    border-radius: 1.5rem;
   }
   
   .slider:before {
     position: absolute;
     content: "";
-    height: 26px;
-    width: 26px;
-    left: 4px;
-    bottom: 4px;
+    height: 1.75rem;
+    width: 1.75rem;
+    left: 0.675rem;
+    bottom: 0.375rem;
     background-color: white;
     transition: .4s;
     border-radius: 50%;
@@ -167,16 +174,16 @@ input {
   
   /* Move the slider when the checkbox is checked */
   input:checked + .slider:before {
-    transform: translateX(26px);
+    transform: translateX( 2rem );
   }
 
 select {
     width: 95%;
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
+    padding: 0.5rem;
+    border-radius: 0.125rem;
     background-color: #fff;
-    font-size: 16px;
+    font-size: 2rem;
     margin-bottom: 2rem;
     transition: border-color 0.3s ease;
 }
+select option { font-size: 1rem; }

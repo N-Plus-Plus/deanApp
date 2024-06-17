@@ -13,98 +13,19 @@
 <body>
     <main id="main">
         <section class="bar" id="topBalance">
-            <div class="segment grey" id="toDate">$59,250</div>
-            <div class="segment green" id="income">$9,500</div>
-            <div class="segment red" id="outcome">$2,750</div>
-            <div class="segment white" id="balance">$6,750</div>
+            <div class="segment green" id="income">$0.00</div>
+            <div class="segment red" id="outcome">$0.00</div>
+            <div class="segment white" id="balance">$0.00</div>
         </section>
         <section class="middle" id="middle">
-            <div class="modalShade" id="modalShade">
-                <div class="modal" id="modal">
-                    <div class="closeModal" data-function="toggleModal"></div>
-                    Hey there!<p>
-                    Because this is the first time you're launching this web app, before we get to salary and expenses, please enter the amount of past savings below.<p>
-                    This number should be all of your money that, before the start of this month, has been put away: This app will update this figure as you end months going forward.<p>
-                    Oh, and this web app works in whole dollars, so there may be a slight drift from your bank balance by a few dollars over time ... but it'll be close enough.<p>
-                    <div class="inputGroup">
-                        <input type="text" name="currency-field" id="startFunds" pattern="^\$\d{1,3}(,\d{3})*(\.\d+)?$" value="" data-type="currency" placeholder="1,000,000">
-                        <div class="button textButton" data-function="commitStartFunds">Commit</div>
-                    </div>
-                </div>
+            <div class="modalShade noDisplay" id="modalShade">
+                <div class="modal" id="modal"></div>
             </div>
             <div id="envelopeBody">
-                <div class="row">
-                    <div class="title1"><b>Envelope</b></div>
-                    <div class="segment title1"><b>Funds</b></div>
-                    <div class="segment title1"><b>Spent</b></div>
-                    <div class="segment title1"><b>Balance</b></div>
-                    <div class="void"></div>
-                    <div class="void"></div>
-                </div>
-                <div class="row">
-                    <div class="title">Savings</div>
-                    <div class="segment green">$7,200</div>
-                    <div class="segment red"></div>
-                    <div class="segment white"></div>
-                    <div class="void"></div>
-                    <div class="transfer"></div>
-                </div>
-                <div class="progress">
-                    <div class="spent" style="width: 0%;"></div>
-                </div>
-                <div class="row">
-                    <div class="title">Petrol</div>
-                    <div class="segment green">$500</div>
-                    <div class="segment red">$200</div>
-                    <div class="segment white">$300</div>
-                    <div class="void"></div>
-                    <div class="add"></div>
-                    <div class="subtract"></div>
-                    <div class="transfer"></div>
-                </div>
-                <div class="progress">
-                    <div class="spent" style="width: 40%;"></div>
-                </div>
-                <div class="row">
-                    <div class="title">Food</div>
-                    <div class="segment green">$1,000</div>
-                    <div class="segment red">$500</div>
-                    <div class="segment white">$500</div>
-                    <div class="void"></div>
-                    <div class="add"></div>
-                    <div class="subtract"></div>
-                    <div class="transfer"></div>
-                </div>
-                <div class="progress">
-                    <div class="spent" style="width: 50%;"></div>
-                </div>
-                <div class="row">
-                    <div class="title">Heroin</div>
-                    <div class="segment green">$600</div>
-                    <div class="segment red">$800</div>
-                    <div class="segment red">-$200</div>
-                    <div class="void"></div>
-                    <div class="add"></div>
-                    <div class="subtract"></div>
-                    <div class="transfer"></div>
-                </div>
-                <div class="progress">
-                    <div class="spent" style="width: 100%;"></div>
-                    <div class="overspend" style="width: 25%;"></div>
-                </div>
-                <div class="row">
-                    <div class="title">Nappies</div>
-                    <div class="segment green">$200</div>
-                    <div class="segment red">$0</div>
-                    <div class="segment white">$200</div>
-                    <div class="void"></div>
-                    <div class="add"></div>
-                    <div class="subtract"></div>
-                    <div class="transfer"></div>
-                </div>
-                <div class="progress">
-                    <div class="spent" style="width: 0%;"></div>
-                </div>
+                <div class="middleLabel">Envelopes</div>
+            </div>
+            <div id="incomeBody">
+                <div class="middleLabel">Income</div>
             </div>
         </section>
         <section class="bar" id="bottomButtons">

@@ -1,11 +1,17 @@
 window.addEventListener("mousedown", function (e) { clicked( e ); } );
+document.addEventListener(`DOMContentLoaded`, function () { onLoad(); } );
+
+function onLoad(){
+    // buildModal(`firstLaunch`);
+    // toggleModal();
+}
 
 function clicked( e ){
     let f = e.target.getAttribute( "data-function" );
     if( f == `toggleModal` ){ toggleModal(); }
     if( f == `commitStartFunds` ){ commitStartFunds( document.getElementById("startFunds").value  ); }
     if( f == `addSalary` ){ buildModal( `addSalary` ); toggleModal(); }
-    if( f == `addIncome` ){ addIncome( document.getElementById("addSalary").value ); }
+    if( f == `addIncome` ){ addIncome( document.getElementById("addSalary").value, document.getElementById("incomeTitle").value ); }
     if( f == `transferFunds` ){ buildModal( `transferFunds` ); toggleModal(); temp.from = e.target.getAttribute( `data-discriminator` ); }
     if( f == `executeFundsTransfer` ){ transfer( temp.from, temp.to, !document.getElementById(`topUpOrNot`).checked, document.getElementById(`transferAmt`).value ); }
     if( f == `addExpense` ){ buildModal( `addExpense` ); toggleModal(); }
@@ -18,12 +24,13 @@ function clicked( e ){
 var fund = {
     past: 59250,
     income: 0,
+    incomeDeets: [],
     spent: 0
 }
 
 var env = {
     envelope0: {
-        display: `Savings`
+        display: `Unallocated`
         , starting: 0
         , added: 0
         , spent: 0
@@ -54,16 +61,16 @@ function addEnvelope( name ){
     closeModal();
 }
 
-function addIncome( amt ){
-    amt = parseInt( amt );
-    fund.income += amt;
+function addIncome( amt, title ){
+    amt = parseFloat( amt.replace(/[^0-9.]/g, '') );
+    fund.incomeDeets.push( { amt: amt, title: title } );
     env.envelope0.added += amt;
     updateDisplay();
     closeModal();
 }
 
 function transfer( fromId, toId, aggregate, amt ){
-    amt = parseInt( amt );
+    amt = parseFloat( amt.replace(/[^0-9.]/g, '') );
     if( envelopeBalance( fromId ) >= amt ){
         if( aggregate ){
             env[fromId].added -= amt;
@@ -81,7 +88,7 @@ function transfer( fromId, toId, aggregate, amt ){
 
 function addExpense( envId, amt ){
     console.log( envId, amt );
-    amt = parseInt( amt );
+    amt = parseFloat( amt.replace(/[^0-9.]/g, '') );
     env[envId].spent += amt;
     fund.spent += amt;
     updateDisplay();
@@ -103,26 +110,30 @@ function closeModal(){ document.getElementById("modalShade").classList.add( `noD
 function updateDisplay(){
     updateTopBar();
     updateEnvelopes();
+    updateIncomes();
 }
 
 function updateTopBar(){
     let t = document.getElementById(`topBalance`);
-    t.children[0].innerHTML = niceNumber( fund.past );
-    t.children[1].innerHTML = niceNumber( fund.income );
-    t.children[2].innerHTML = niceNumber( fund.spent );
-    t.children[3].innerHTML = niceNumber( fund.income - fund.spent );
+    let budget = 0;
+    for( let i = 0; i < fund.incomeDeets.length; i++ ){ budget += fund.incomeDeets[i].amt; }
+    let spent = 0;
+    for( const key in env ){ spent += env[key].spent; }
+    t.children[0].innerHTML = niceNumber( budget );
+    t.children[1].innerHTML = niceNumber( spent );
+    t.children[2].innerHTML = niceNumber( budget - spent );
 }
 
 function updateEnvelopes(){
     let t = document.getElementById("envelopeBody");
-    t.innerHTML = `<div class="row">
-        <div class="title1"><b>Envelope</b></div>
-        <div class="segment title1"><b>Funds</b></div>
-        <div class="segment title1"><b>Spent</b></div>
-        <div class="segment title1"><b>Balance</b></div>
-        <div class="void"></div>
-        <div class="void"></div>
-    </div>`;
+    t.innerHTML = `<div class="middleLabel envLabel">Envelopes</div>
+        <div class="row">
+            <div class="title"></div>
+            <div class="rowSegment title1"><b>Budget</b></div>
+            <div class="rowSegment title1"><b>Spent</b></div>
+            <div class="rowSegment title1"><b>Balance</b></div>
+            <div class="void"></div>
+        </div>`;
     for( let i = 0; i < Object.keys( env ).length; i++ ){
         if( env[`envelope${i}`].active ){
             let available = env[`envelope${i}`].starting + env[`envelope${i}`].added;
@@ -130,10 +141,9 @@ function updateEnvelopes(){
             t.innerHTML += `
                 <div class="row">
                     <div class="title">${env[`envelope${i}`].display}</div>
-                    <div class="segment green">${ niceNumber( available ) }</div>
-                    <div class="segment red">${ niceNumber( consumed ) }</div>
-                    <div class="segment white">${ niceNumber( available - consumed ) }</div>
-                    <div class="void"></div>
+                    <div class="rowSegment green">${ niceNumber( available ) }</div>
+                    <div class="rowSegment red">${ niceNumber( consumed ) }</div>
+                    <div class="rowSegment white">${ niceNumber( available - consumed ) }</div>
                     <div class="transfer" data-function="transferFunds" data-discriminator="${`envelope${i}`}"></div>
                 </div>
                 <div class="progress">
@@ -151,6 +161,19 @@ function updateEnvelopes(){
     `
 }
 
+function updateIncomes(){
+    let t = document.getElementById(`incomeBody`);
+    t.innerHTML = `<div class="middleLabel">Income</div>`
+    for( let i = 0; i < fund.incomeDeets.length; i++ ){
+        t.innerHTML += `
+        <div class="incomeRow">
+            <div class="incomeLabel">${fund.incomeDeets[i].title}</div>
+            <div class="incomeLabel rightAlign green">${niceNumber(fund.incomeDeets[i].amt)}</div>
+        </div>
+        `
+    }
+}
+
 function buildModal( content ){
     let t = document.getElementById(`modal`);
     if( content == `firstLaunch` ){
@@ -158,10 +181,9 @@ function buildModal( content ){
             <div class="closeModal" data-function="toggleModal"></div>
             Hey there!<p>
             Because this is the first time you're launching this web app, before we get to salary and expenses, please enter the amount of past savings below.<p>
-            This number should be all of your money that, before the start of this month, has been put away: This app will update this figure as you end months going forward.<p>
-            Oh, and this web app works in whole dollars, so there may be a slight drift from your bank balance by a few dollars over time ... but it'll be close enough.<p>
+            This will appear as Rollover Income and appear in your Unallocated bucket to get things started.<p>
             <div class="inputGroup">
-                <input type="text" name="currency-field" id="startFunds" pattern="^\$\d{1,3}(,\d{3})*(\.\d+)?$" value="" data-type="currency" placeholder="1,000,000">
+                <input type="text" name="currency-field" id="startFunds" value="" data-type="currency" placeholder="1,000,000.00">
                 <div class="button textButton" data-function="commitStartFunds">Commit</div>
             </div>
         `
@@ -169,11 +191,17 @@ function buildModal( content ){
     else if( content == `addSalary` ){
         t.innerHTML = `
             <div class="closeModal" data-function="toggleModal"></div>
-            Enter the new Salary into the box below.</p>
-            It will be automatically added to Savings for this month (you can move it from there to other envelopes as you see fit).</p>
-            Pro tip - you can enter a negative number to make money disappear, in case you made an error, or because some money actually disappeared!</p>
+            Enter the source and amount of the new Income into the boxes below.</p>
+            It will be automatically added to Unallocated for this month (you can move it from there to other envelopes).</p>
+            <div class="vertBox">
+                <div class="modalLabel">Source</div>
+                <input class="hundo" type="text" name="text-field" id="incomeTitle" value="" data-type="title" placeholder="Deano">
+            </div>
             <div class="inputGroup">
-                <input type="text" name="currency-field" id="addSalary" pattern="^\$\d{1,3}(,\d{3})*(\.\d+)?$" value="" data-type="currency" placeholder="1,000,000">
+                <div class="vertBox">
+                    <div class="modalLabel">Amount</div>
+                    <input class="hundo" type="text" name="currency-field" id="addSalary" value="" data-type="currency" placeholder="$1,123.58">
+                </div>
                 <div class="button textButton" data-function="addIncome">Commit</div>
             </div>
         `
@@ -202,7 +230,7 @@ function buildModal( content ){
                 </div>
             </div>
             <div class="inputGroup">
-                <input type="text" name="currency-field" id="transferAmt" pattern="^\$\d{1,3}(,\d{3})*(\.\d+)?$" value="" data-type="currency" placeholder="1,000,000">
+                <input type="text" name="currency-field" id="transferAmt" value="" data-type="currency" placeholder="$1,123.58">
                 <div class="button textButton" data-function="executeFundsTransfer">Transfer</div>
             </div>
         `
@@ -219,7 +247,7 @@ function buildModal( content ){
                 </div>
             </div>
             <div class="inputGroup">
-                <input type="text" name="currency-field" id="expenseAmount" pattern="^\$\d{1,3}(,\d{3})*(\.\d+)?$" value="" data-type="currency" placeholder="1,000,000">
+                <input type="text" name="currency-field" id="expenseAmount" value="" data-type="currency" placeholder="$1,123.58">
                 <div class="button textButton" data-function="executeExpense">Spend</div>
             </div>
         </div>
@@ -268,9 +296,16 @@ function updateDropDowns(){
 
 function niceNumber( amt ){
     let isNegative = amt < 0;
-    const absoluteAmt = Math.abs(Math.round(amt));
-    if( absoluteAmt == 0 ){ isNegative = false; }
-    const formattedAmt = absoluteAmt.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    const absoluteAmt = Math.abs(amt).toFixed(2); // Ensure two decimal places
+    if (parseFloat( absoluteAmt ) == 0) {
+        isNegative = false;
+    }
+    // Split the amount into dollars and cents
+    const parts = absoluteAmt.split('.');
+    // Format the dollars part with commas
+    parts[0] = parts[0].toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    // Join the parts back together
+    const formattedAmt = parts.join('.');
     return (isNegative ? "-$" : "$") + formattedAmt;
 }
 
@@ -314,5 +349,7 @@ Cents Matter
 Pie chart that shows spending per envelope per month over time
 
 Individual expenses is useful
+
+cannot spend out of unallocated
 
 */
