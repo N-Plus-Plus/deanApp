@@ -1,4 +1,5 @@
 window.addEventListener("mousedown", function (e) { clicked( e ); } );
+window.addEventListener("touchstart", function (e) { clicked(e); });
 document.addEventListener(`DOMContentLoaded`, function () { onLoad(); } );
 
 function onLoad(){
