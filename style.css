@@ -47,11 +47,11 @@ body{
 
 main{ width: 100%; height: 100%; display: flex; flex-wrap:wrap; overflow-y: auto;}
 
-.bar .segment{ font-size: 2.5em;}
+.bar .segment{ font-size: 2rem;}
 .bar{ width: 100%; height: 8rem; padding: 0.5em; display: flex; overflow: hidden; background-color: var(--black); justify-content: space-between; align-items: center; }
 .middle{ width: 100%; height: calc( 100% - 16rem ); display: flex; overflow-y: auto; position: relative; }
 .segment{ width: 30%; height: 100%; display: flex; align-items: center; justify-content: center;}
-.rowSegment{ width: calc( ( 100% - 6rem - 2rem ) / 3 ); height: 100%; display: flex; align-items: center; justify-content: flex-end; }
+.rowSegment{ width: calc( ( 100% - 6rem - 2rem ) / 3 ); height: 100%; display: flex; align-items: center; justify-content: flex-end; font-size: 1.75rem; font-weight: 800;}
 
 .green, .red, .white, .grey {font-family: var( --numeric ); font-weight: 900; }
 .green{ color: var( --lGreen ); }
@@ -84,8 +84,8 @@ main{ width: 100%; height: 100%; display: flex; flex-wrap:wrap; overflow-y: auto
 .row{ width: 100%; height: 2em; display: flex; align-items: center; margin-bottom: 0.5em; font-size: 2rem;}
 .env{ background-image: url(./img/envelope.png); min-width: 1.5em; height: 1.5em; margin-right: 0.75em;}
 .title{ font-family: var(--text); min-width: 6em; }
-.transfer{ background-image: url(./img/transfer.png); width: 2em; height: 2em; margin-left: 0.5em; cursor: pointer;}
-.void{ background-image: none; min-width: 2em; height: 2em; margin-left: 0.5rem;}
+.transfer{ background-image: url(./img/transfer.png); width: 2em; height: 2em; margin-left: 1em; cursor: pointer;}
+.void{ background-image: none; min-width: 2em; height: 2em; margin-left: 1rem;}
 
 .progress{ width: 100%; height: 0.25em; display: flex; align-items: flex-start; justify-content: center; }
 .progress{ position: relative; margin-bottom: 2em; background-color: var(--lgrey);}
@@ -103,8 +103,8 @@ main{ width: 100%; height: 100%; display: flex; flex-wrap:wrap; overflow-y: auto
 
 #envelopeBody{ width: 100%; }
 #incomeBody{ width: calc( 100% - 2rem ); position: absolute; left: 1rem; bottom: 1rem; font-size: 2rem;}
-.middleLabel{ font-size: 2.5rem; font-weight: 800; margin-bottom: 1rem;}
-.envLabel{ position: absolute; top: 1rem; left: 1rem; }
+.middleLabel{ font-size: 2rem; font-weight: 800; margin-bottom: 1rem;}
+.envLabel{ position: absolute; top: 1.5rem; left: 1rem; }
 .incomeLabel{ width: 50%; }
 .rightAlign{ text-align: right;}
 .incomeRow{ width: 100%; height: 2em; display: flex; align-items: center; padding-bottom: 0.5rem; border-bottom: solid 0.125rem #0003;}
@@ -116,13 +116,18 @@ main{ width: 100%; height: 100%; display: flex; flex-wrap:wrap; overflow-y: auto
 
 .modal{ font-size: 2rem; }
 
+.envRow{ display: flex; justify-content: space-between; padding-bottom: 1rem; align-items: center;}
+.hide{ width: 2rem; height: 2rem; background-image: url(./img/delete.png); padding-left: 1rem; cursor: pointer;}
+.unhide{ width: 2rem; height: 2rem; background-image: url(./img/add.png); padding-left: 1rem; cursor: pointer;}
+
 input {
     border-radius: 0.25rem;
     color: #333;
     font-size: 1.5rem;
     padding: .5rem 1rem;
     width: 47.5%;
-  }
+}
+.envInput{ width: 92.5%; }
   
 .hundo{ width: 100%; }
 

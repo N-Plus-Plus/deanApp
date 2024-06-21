@@ -18,6 +18,12 @@ function clicked( e ){
     if( f == `executeExpense` ){ addExpense( temp.from, document.getElementById(`expenseAmount`).value ); }
     if( f == `addEnvelope` ){ buildModal( `addEnvelope` ); toggleModal(); }
     if( f == `executeAddEnvelope` ){ addEnvelope( document.getElementById(`envName`).value ); }
+    if( f == `envelopes` ){ buildModal( `envelopes` ); toggleModal(); }
+    if( f == `hide` ){ hideEnv( e.target ); }
+    if( f == `unhide` ){ unhideEnv( e.target ); }
+    if( f == `saveEnvelopes` ){ saveEnvelopes(); }
+    if( f == `endMonth` ){ buildModal( `endMonth` ); toggleModal(); }
+    if( f == `endCurrentMonth` ){ endCurrentMonth(); }
     console.log( f )
 }
 
@@ -71,7 +77,7 @@ function transfer( fromId, toId, aggregate, amt ){
             env[toId].added += amt;
         }
         else{
-            let float = amt - envelopeBalance( toId );
+            let float = amt - envelopeFundBalance( toId );
             env[fromId].added -= float;
             env[toId].added += float;
         }
@@ -91,6 +97,10 @@ function addExpense( envId, amt ){
 
 function envelopeBalance( envId ){
     return env[envId].starting + env[envId].added - env[envId].spent;
+}
+
+function envelopeFundBalance( envId ){
+    return env[envId].starting + env[envId].added;
 }
 
 function toggleModal(){
@@ -168,13 +178,60 @@ function updateIncomes(){
     }
 }
 
+function saveEnvelopes(){
+    let t = document.getElementById(`envelopesDisp`);
+    for( let i = 1; i <= t.children.length; i++ ){
+        env[`envelope` + i ].display = t.children[i - 1].children[0].value;
+        let a = t.children[ i - 1].children[1].classList == `hide`;
+        if( env[`envelope` + i ].active !== a ){
+            if( env[`envelope` + i ].active ){ deactivate( `envelope` + i ); }
+            else{ activate( `envelope` + i ); }
+        }
+    }
+    closeModal();
+    updateDisplay();
+}
+
+function activate( e ){
+    env[e].active = true;
+    console.log(`activate`)
+}
+
+function deactivate( e ){
+    env[e].active = false;
+    env.envelope0.spent += env[e].spent;
+    env[e].spent = 0;
+    env.envelope0.added += env[e].starting + env[e].added;
+    env[e].starting = 0;
+    env[e].added = 0;
+}
+
+function endCurrentMonth(){
+    let roll = 0;
+    for( const key in env ){
+        if( env.hasOwnProperty(key) ){
+            if( key !== `envelope0` ){
+                let bal = envelopeBalance( key );
+                env[key].spent = 0;
+                env[key].added = 0;
+                env[key].starting = bal;
+                roll += bal;
+            }
+        }
+    }
+    roll += envelopeBalance( `envelope0` );
+    fund.incomeDeets = [ { amt: roll, title: `Rolled Over` } ];
+    closeModal();
+    updateDisplay();
+}
+
 function buildModal( content ){
     let t = document.getElementById(`modal`);
     if( content == `addSalary` ){
         t.innerHTML = `
             <div class="closeModal" data-function="toggleModal"></div>
             Enter the source and amount of the new Income into the boxes below.</p>
-            It will be automatically added to Unallocated for this month (you can move it from there to other envelopes).</p>
+            It will be automatically added to Unallocated for this month (you can move it to envelopes).</p>
             <div class="vertBox">
                 <div class="modalLabel">Source</div>
                 <input class="hundo" type="text" name="text-field" id="incomeTitle" value="" data-type="title" placeholder="Deano">
@@ -248,6 +305,58 @@ function buildModal( content ){
         </div>
         `
     }
+    else if( content == `envelopes` ){
+        t.innerHTML = `
+        <div class="closeModal" data-function="toggleModal"></div>
+            Manage your envelopes here.</p>
+            <div class="envelopesDisp" id="envelopesDisp"></div>
+            <div class="inputGroup">
+                <div class="button textButton" data-function="saveEnvelopes">Save</div>
+            </div>
+        </div>
+        `
+        setTimeout(() => { populateEnvelopes(); }, 0);
+    }
+    else if( content == `endMonth` ){
+        t.innerHTML = `
+        <div class="closeModal" data-function="toggleModal"></div>
+            You're about to end the current month.</p>
+            This can't be undone - are you sure?</p>
+            <div class="inputGroup">
+                <div class="button textButton" data-function="endCurrentMonth">Yep!</div>
+            </div>
+        </div>
+        `
+    }
+}
+
+function populateEnvelopes(){
+    let t = document.getElementById( `envelopesDisp` );
+    for( const key in env ){
+        if( env.hasOwnProperty(key) ){
+            if( key !== `envelope0` ){
+                const row = document.createElement('div');
+                let h = env[key].active ? "hide" : "unhide";
+                row.classList = `envRow`;
+                row.setAttribute( `value-env`, key );
+                row.innerHTML = `
+                    <input class="envInput" type="text" id="${key}" name="${key}" value="${env[key].display}">
+                    <div data-function="${ h }" class="${ h }"></div>
+                `
+                t.appendChild(row);
+            }
+        }
+    }
+}
+
+function hideEnv( t ){
+    t.setAttribute( `data-function`, `unhide` );
+    t.classList = `unhide`;
+}
+
+function unhideEnv( t ){
+    t.setAttribute( `data-function`, `hide` );
+    t.classList = `hide`;
 }
 
 function updateDropDowns(){
