@@ -3,8 +3,7 @@ window.addEventListener("touchstart", function (e) { clicked(e); });
 document.addEventListener(`DOMContentLoaded`, function () { onLoad(); } );
 
 function onLoad(){
-    // buildModal(`firstLaunch`);
-    // toggleModal();
+    updateDisplay();
 }
 
 function clicked( e ){
