@@ -18,7 +18,7 @@
     --loading: #656D78;
 }
 
-html {  font-size: 12px; /* Default base font size */}
+html {  font-size: 8px; /* Default base font size */}
 
 body{
     background-color: var(--charcoal);
