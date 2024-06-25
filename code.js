@@ -5,6 +5,7 @@ document.addEventListener(`DOMContentLoaded`, function () { onLoad(); } );
 function onLoad(){
     // buildModal(`firstLaunch`);
     // toggleModal();
+    loadData();
     updateDisplay();
 }
 
@@ -113,6 +114,7 @@ function toggleModal(){
 function closeModal(){ document.getElementById("modalShade").classList.add( `noDisplay` ); }
 
 function updateDisplay(){
+    saveData();
     updateTopBar();
     updateEnvelopes();
     updateIncomes();
@@ -401,6 +403,22 @@ function niceNumber( amt ){
     return (isNegative ? "-$" : "$") + formattedAmt;
 }
 
+function saveData() {
+    const data = {
+        fund: fund,
+        env: env
+    };
+    localStorage.setItem('financeData', JSON.stringify(data));
+}
+
+function loadData() {
+    const data = localStorage.getItem('financeData');
+    if (data) {
+        const parsedData = JSON.parse(data);
+        fund = parsedData.fund;
+        env = parsedData.env;
+    }
+}
 
 
 /*
