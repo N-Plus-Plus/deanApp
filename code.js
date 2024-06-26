@@ -233,6 +233,7 @@ function endCurrentMonth(){
 
 function resetAllIncome(){
     fund.incomeDeets = [];
+    env.envelope0.added = 0;
     closeModal();
     updateDisplay();
 }
