@@ -26,6 +26,9 @@ function clicked( e ){
     if( f == `saveEnvelopes` ){ saveEnvelopes(); }
     if( f == `endMonth` ){ buildModal( `endMonth` ); toggleModal(); }
     if( f == `endCurrentMonth` ){ endCurrentMonth(); }
+    if( f == `resetIncome` ){ buildModal( `resetIncome` ); toggleModal(); }
+    if( f == `resetAllIncome` ){ resetAllIncome(); }
+    if( f == `closeModal` ){ closeModal(); }
     console.log( f )
 }
 
@@ -64,7 +67,7 @@ function addEnvelope( name ){
 }
 
 function addIncome( amt, title ){
-    amt = parseFloat( amt.replace(/[^0-9.]/g, '') );
+    amt = parseFloat( amt.replace(/(?!^-)[^0-9.]/g, '') );
     fund.incomeDeets.push( { amt: amt, title: title } );
     env.envelope0.added += amt;
     updateDisplay();
@@ -228,6 +231,12 @@ function endCurrentMonth(){
     updateDisplay();
 }
 
+function resetAllIncome(){
+    fund.incomeDeets = [];
+    closeModal();
+    updateDisplay();
+}
+
 function buildModal( content ){
     let t = document.getElementById(`modal`);
     if( content == `addSalary` ){
@@ -327,6 +336,17 @@ function buildModal( content ){
             This can't be undone - are you sure?</p>
             <div class="inputGroup">
                 <div class="button textButton" data-function="endCurrentMonth">Yep!</div>
+            </div>
+        </div>
+        `
+    }
+    else if( content == `resetIncome` ){
+        t.innerHTML = `
+        <div class="closeModal" data-function="toggleModal"></div>
+            You want to reset all the income back to zero?</p>
+            <div class="inputGroup">
+                <div class="button textButton" data-function="resetAllIncome">Yep!</div>
+                <div class="button textButton" data-function="closeModal">Nuh uh!</div>
             </div>
         </div>
         `
