@@ -134,7 +134,7 @@ function updateTopBar(){
 function updateEnvelopes(){
     let t = document.getElementById("envelopeBody");
     t.innerHTML = `<div class="middleLabel envLabel">Envelopes</div>
-        <div class="row">
+        <div class="row firstRow">
             <div class="title"></div>
             <div class="rowSegment title1"><b>Budget</b></div>
             <div class="rowSegment title1"><b>Spent</b></div>

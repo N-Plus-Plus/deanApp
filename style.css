@@ -49,9 +49,10 @@ main{ width: 100%; height: 100%; display: flex; flex-wrap:wrap; overflow-y: auto
 
 .bar .segment{ font-size: 2rem;}
 .bar{ width: 100%; height: 8rem; padding: 0.5em; display: flex; overflow: hidden; background-color: var(--black); justify-content: space-between; align-items: center; }
-.middle{ width: 100%; height: calc( 100% - 16rem ); display: flex; overflow-y: auto; position: relative; }
+.middle{ width: 100%; height: calc( 100% - 12rem ); display: flex; overflow-y: auto; position: relative; }
 .segment{ width: 30%; height: 100%; display: flex; align-items: center; justify-content: center;}
-.rowSegment{ width: calc( ( 100% - 6rem - 2rem ) / 3 ); height: 100%; display: flex; align-items: center; justify-content: flex-end; font-size: 1.75rem; font-weight: 800;}
+.rowSegment{ width: calc( ( 100% - 6rem - 2rem ) / 3 ); height: 100%; display: flex; align-items: center; justify-content: flex-end; font-size: 1.75rem; font-weight: 800; letter-spacing: -0.1rem;}
+#topBalance { height: 4rem; }
 
 .green, .red, .white, .grey {font-family: var( --numeric ); font-weight: 900; }
 .green{ color: var( --lGreen ); }
@@ -65,7 +66,7 @@ main{ width: 100%; height: 100%; display: flex; flex-wrap:wrap; overflow-y: auto
 #addExpense{ background-image: url(./img/addExpense.png);}
 #envelopes{ background-image: url(./img/envelopes.png);}
 #endMonth{ background-image: url(./img/endMonth.png);}
-.add{ background-image: url(./img/add.png); width: 3rem; height: 3rem; cursor: pointer; }
+.add{ background-image: url(./img/add.png); width: 2rem; height: 2rem; margin-top: 1rem; cursor: pointer; }
 
 .modalShade{ width: 100%; height: 100%; background-color: #000c; display: flex; align-items: center; justify-content: center; position: absolute; top: 0; left: 0; z-index: 100;}
 .modal{ background-color: var(--black); width: 80%; padding: 1rem; font-size: 1.5rem; position: relative;}
@@ -81,14 +82,16 @@ main{ width: 100%; height: 100%; display: flex; flex-wrap:wrap; overflow-y: auto
     flex-direction: column;
 }
 
-.row{ width: 100%; height: 1.5em; display: flex; align-items: center; margin-top: 0.25em; font-size: 1.5rem;}
+.row{ width: 100%; height: 1.5em; display: flex; align-items: center; margin-bottom: 0.25em; font-size: 1.5rem;}
 .env{ background-image: url(./img/envelope.png); min-width: 1.5em; height: 1.5em; margin-right: 0.75em;}
-.title{ font-family: var(--text); min-width: 6em; }
-.transfer{ background-image: url(./img/transfer.png); width: 2em; height: 2em; margin-left: 1em; cursor: pointer;}
-.void{ background-image: none; min-width: 2em; height: 2em; margin-left: 1rem;}
+.title{ font-family: var(--text); min-width: 8em; }
+.transfer{ background-image: url(./img/transfer.png); width: 1.5em; height: 1.5em; margin-left: 1em; cursor: pointer;}
+.void{ background-image: none; min-width: 1.5em; height: 1.5em; margin-left: 1rem;}
+
+.row.firstRow { height: 3rem; }
 
 .progress{ width: 100%; height: 0.25em; display: flex; align-items: flex-start; justify-content: center; }
-.progress{ position: relative; margin-bottom: 2em; background-color: var(--lgrey);}
+.progress{ position: relative; margin-bottom: 1em; background-color: var(--lgrey);}
 .spent{ position: absolute; top: 0; left: 0; height: 100%; background-color: var(--red);}
 .overspend{ position: absolute; top: 0; right: 0; height: 100%; background-color: var(--overspend);}
 
