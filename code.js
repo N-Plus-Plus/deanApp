@@ -1,486 +1,388 @@
-window.addEventListener("mousedown", function (e) { clicked( e ); } );
-window.addEventListener("touchstart", function (e) { clicked(e); });
 document.addEventListener(`DOMContentLoaded`, function () { onLoad(); } );
+window.addEventListener(`mousedown`, function (e) { clicked( e.target ) } );
+// window.addEventListener(`mouseover`, function (e) { sel( e.target, true ) } );
+// window.addEventListener(`mouseout`, function (e) { sel( e.target, false ) } );
+
 
 function onLoad(){
-    // buildModal(`firstLaunch`);
-    // toggleModal();
-    loadData();
-    updateDisplay();
+    buildBoard( 0, 10 );
+    buildBar();
+    setInterval(() => {
+        if( state.anim ){ doAnim( false ); }
+        else{ mine(); }
+    }, state.tickTime );
 }
 
-function clicked( e ){
-    let f = e.target.getAttribute( "data-function" );
-    if( f == `toggleModal` ){ toggleModal(); }
-    if( f == `addSalary` ){ buildModal( `addSalary` ); toggleModal(); }
-    if( f == `addIncome` ){ addIncome( document.getElementById("addSalary").value, document.getElementById("incomeTitle").value ); }
-    if( f == `transferFunds` ){ buildModal( `transferFunds` ); toggleModal(); temp.from = e.target.getAttribute( `data-discriminator` ); }
-    if( f == `executeFundsTransfer` ){ transfer( temp.from, temp.to, !document.getElementById(`topUpOrNot`).checked, document.getElementById(`transferAmt`).value ); }
-    if( f == `addExpense` ){ buildModal( `addExpense` ); toggleModal(); }
-    if( f == `executeExpense` ){ addExpense( temp.from, document.getElementById(`expenseAmount`).value ); }
-    if( f == `addEnvelope` ){ buildModal( `addEnvelope` ); toggleModal(); }
-    if( f == `executeAddEnvelope` ){ addEnvelope( document.getElementById(`envName`).value ); }
-    if( f == `envelopes` ){ buildModal( `envelopes` ); toggleModal(); }
-    if( f == `hide` ){ hideEnv( e.target ); }
-    if( f == `unhide` ){ unhideEnv( e.target ); }
-    if( f == `saveEnvelopes` ){ saveEnvelopes(); }
-    if( f == `endMonth` ){ buildModal( `endMonth` ); toggleModal(); }
-    if( f == `endCurrentMonth` ){ endCurrentMonth(); }
-    if( f == `resetIncome` ){ buildModal( `resetIncome` ); toggleModal(); }
-    if( f == `resetAllIncome` ){ resetAllIncome(); }
-    if( f == `closeModal` ){ closeModal(); }
-    console.log( f )
-}
+function clicked( e ){}
 
-var fund = {
-    past: 0,
-    income: 0,
-    incomeDeets: [],
-    spent: 0
-}
-
-var env = {
-    envelope0: {
-        display: `Unallocated`
-        , starting: 0
-        , added: 0
-        , spent: 0
-        , active: true
-    }
-}
-
-var temp = { from: `envelope0`, to: `envelope0` }
-
-function updateFrom(){ temp.from = document.getElementById(`fromEnv`).value; }
-function updateTo(){ temp.to = document.getElementById(`toEnv`).value; }
-
-function addEnvelope( name ){
-    env[`envelope` + Object.keys( env ).length] = {
-        display: name
-        , starting: 0
-        , added: 0
-        , spent: 0
-        , active: true
-    }
-    updateDisplay();
-    closeModal();
-}
-
-function addIncome( amt, title ){
-    amt = parseFloat( amt.replace(/(?!^-)[^0-9.]/g, '') );
-    fund.incomeDeets.push( { amt: amt, title: title } );
-    env.envelope0.added += amt;
-    updateDisplay();
-    closeModal();
-}
-
-function transfer( fromId, toId, aggregate, amt ){
-    amt = parseFloat( amt.replace(/[^0-9.]/g, '') );
-    if( envelopeBalance( fromId ) >= amt ){
-        if( aggregate ){
-            env[fromId].added -= amt;
-            env[toId].added += amt;
+function sel( e, on ){
+    if( e.classList.contains( `tile` ) ){
+        let x = parseInt( e.getAttribute( `data-x` ) );
+        let y = parseInt( e.getAttribute( `data-y` ) );
+        if( on ){
+            state.target = { x: x, y: y }            
         }
         else{
-            let float = amt - envelopeFundBalance( toId );
-            env[fromId].added -= float;
-            env[toId].added += float;
-        }
-    }
-    updateDisplay();
-    closeModal();
-}
-
-function addExpense( envId, amt ){
-    console.log( envId, amt );
-    amt = parseFloat( amt.replace(/[^0-9.]/g, '') );
-    env[envId].spent += amt;
-    fund.spent += amt;
-    updateDisplay();
-    closeModal();
-}
-
-function envelopeBalance( envId ){
-    return env[envId].starting + env[envId].added - env[envId].spent;
-}
-
-function envelopeFundBalance( envId ){
-    return env[envId].starting + env[envId].added;
-}
-
-function toggleModal(){
-    let t = document.getElementById("modalShade");
-    if( t.classList.contains( `noDisplay` ) ){ t.classList.remove( `noDisplay` ) }
-    else{ t.classList.add( `noDisplay` ); }
-}
-
-function closeModal(){ document.getElementById("modalShade").classList.add( `noDisplay` ); }
-
-function updateDisplay(){
-    saveData();
-    updateTopBar();
-    updateEnvelopes();
-    updateIncomes();
-}
-
-function updateTopBar(){
-    let t = document.getElementById(`topBalance`);
-    let budget = 0;
-    for( let i = 0; i < fund.incomeDeets.length; i++ ){ budget += fund.incomeDeets[i].amt; }
-    let spent = 0;
-    for( const key in env ){ spent += env[key].spent; }
-    t.children[0].innerHTML = niceNumber( budget );
-    t.children[1].innerHTML = niceNumber( spent );
-    t.children[2].innerHTML = niceNumber( budget - spent );
-}
-
-function updateEnvelopes(){
-    let t = document.getElementById("envelopeBody");
-    t.innerHTML = `<div class="middleLabel envLabel">Envelopes</div>
-        <div class="row firstRow">
-            <div class="title"></div>
-            <div class="rowSegment title1"><b>Budget</b></div>
-            <div class="rowSegment title1"><b>Spent</b></div>
-            <div class="rowSegment title1"><b>Balance</b></div>
-            <div class="void"></div>
-        </div>`;
-    for( let i = 0; i < Object.keys( env ).length; i++ ){
-        if( env[`envelope${i}`].active ){
-            let available = env[`envelope${i}`].starting + env[`envelope${i}`].added;
-            let consumed = env[`envelope${i}`].spent;
-            t.innerHTML += `
-                <div class="row">
-                    <div class="title">${env[`envelope${i}`].display}</div>
-                    <div class="rowSegment green">${ niceNumber( available ) }</div>
-                    <div class="rowSegment red">${ niceNumber( consumed ) }</div>
-                    <div class="rowSegment white">${ niceNumber( available - consumed ) }</div>
-                    <div class="transfer" data-function="transferFunds" data-discriminator="${`envelope${i}`}"></div>
-                </div>
-                <div class="progress">
-                    <div class="spent" style="width: ${ Math.min( 100, consumed / available * 100 ) }%;"></div>
-                    <div class="overspend" style="width: ${ Math.max( 0, (
-                        ( consumed - available ) / consumed
-                    ) ) * 100 }%;"></div>
-                </div>`
-        }
-    }
-    t.innerHTML += `
-        <div class="row">
-            <div class="add" data-function="addEnvelope"></div>
-        </div>
-    `
-}
-
-function updateIncomes(){
-    let t = document.getElementById(`incomeBody`);
-    t.innerHTML = `<div class="middleLabel">Income</div>`
-    for( let i = 0; i < fund.incomeDeets.length; i++ ){
-        t.innerHTML += `
-        <div class="incomeRow">
-            <div class="incomeLabel">${fund.incomeDeets[i].title}</div>
-            <div class="incomeLabel rightAlign green">${niceNumber(fund.incomeDeets[i].amt)}</div>
-        </div>
-        `
-    }
-}
-
-function saveEnvelopes(){
-    let t = document.getElementById(`envelopesDisp`);
-    for( let i = 1; i <= t.children.length; i++ ){
-        env[`envelope` + i ].display = t.children[i - 1].children[0].value;
-        let a = t.children[ i - 1].children[1].classList == `hide`;
-        if( env[`envelope` + i ].active !== a ){
-            if( env[`envelope` + i ].active ){ deactivate( `envelope` + i ); }
-            else{ activate( `envelope` + i ); }
-        }
-    }
-    closeModal();
-    updateDisplay();
-}
-
-function activate( e ){
-    env[e].active = true;
-    console.log(`activate`)
-}
-
-function deactivate( e ){
-    env[e].active = false;
-    env.envelope0.spent += env[e].spent;
-    env[e].spent = 0;
-    env.envelope0.added += env[e].starting + env[e].added;
-    env[e].starting = 0;
-    env[e].added = 0;
-}
-
-function endCurrentMonth(){
-    let roll = 0;
-    for( const key in env ){
-        if( env.hasOwnProperty(key) ){
-            if( key !== `envelope0` ){
-                let bal = envelopeBalance( key );
-                env[key].spent = 0;
-                env[key].added = 0;
-                env[key].starting = bal;
-                roll += bal;
-            }
-        }
-    }
-    roll += envelopeBalance( `envelope0` );
-    fund.incomeDeets = [ { amt: roll, title: `Rolled Over` } ];
-    closeModal();
-    updateDisplay();
-}
-
-function resetAllIncome(){
-    fund.incomeDeets = [];
-    env.envelope0.added = 0;
-    closeModal();
-    updateDisplay();
-}
-
-function buildModal( content ){
-    let t = document.getElementById(`modal`);
-    if( content == `addSalary` ){
-        t.innerHTML = `
-            <div class="closeModal" data-function="toggleModal"></div>
-            Enter the source and amount of the new Income into the boxes below.</p>
-            It will be automatically added to Unallocated for this month (you can move it to envelopes).</p>
-            <div class="vertBox">
-                <div class="modalLabel">Source</div>
-                <input class="hundo" type="text" name="text-field" id="incomeTitle" value="" data-type="title" placeholder="Deano">
-            </div>
-            <div class="inputGroup">
-                <div class="vertBox">
-                    <div class="modalLabel">Amount</div>
-                    <input class="hundo" type="text" name="currency-field" id="addSalary" value="" data-type="currency" placeholder="$1,123.58">
-                </div>
-                <div class="button textButton" data-function="addIncome">Commit</div>
-            </div>
-        `
-    }
-    else if( content == `transferFunds` ){
-        t.innerHTML = `
-            <div class="closeModal" data-function="toggleModal"></div>
-            This is where you can move money between envelopes.</p>
-            You can either just move a specific amount of dollars from one envelope to another, or move however many dollars it takes to "top up" to a new balance you set.</p>
-            Pro tip - You can "top up" to a figure that's bigger or smaller than the current balance of the Envelope!</p>
-            <div class="inputGroup">
-                <div class="label">Top up?</div>
-                <label class="switch">
-                    <input type="checkbox" id="topUpOrNot">
-                    <span class="slider"></span>
-                </label>
-            </div>
-            <div class="inputGroup">
-                <div class="vertBox">
-                    <div class="modalLabel">From Envelope</div>
-                    <select id="fromEnv" onchange="updateFrom()"></select>
-                </div>
-                <div class="vertBox">
-                    <div class="modalLabel">To Envelope</div>
-                    <select id="toEnv" onchange="updateTo()"></select>
-                </div>
-            </div>
-            <div class="inputGroup">
-                <input type="text" name="currency-field" id="transferAmt" value="" data-type="currency" placeholder="$1,123.58">
-                <div class="button textButton" data-function="executeFundsTransfer">Transfer</div>
-            </div>
-        `
-        setTimeout(() => { updateDropDowns(); }, 0 );
-    }
-    else if( content == `addExpense` ){
-        t.innerHTML = `
-        <div class="closeModal" data-function="toggleModal"></div>
-            Add an expense by choosing which envelope it should come out of and specifying how much it was.</p>
-            <div class="inputGroup">
-                <div class="vertBox">
-                    <div class="modalLabel">From Envelope</div>
-                    <select id="fromEnv" onchange="updateFrom()"></select>
-                </div>
-            </div>
-            <div class="inputGroup">
-                <input type="text" name="currency-field" id="expenseAmount" value="" data-type="currency" placeholder="$1,123.58">
-                <div class="button textButton" data-function="executeExpense">Spend</div>
-            </div>
-        </div>
-        `
-        setTimeout(() => { updateDropDowns(); }, 0 );
-    }
-    else if( content == `addEnvelope` ){
-        t.innerHTML = `
-        <div class="closeModal" data-function="toggleModal"></div>
-            Give your new Envelope a name below.</p>
-            This Envelope will start with a balance of $0, but you can transfer into it as soon as it's created.</p>
-            <div class="inputGroup">
-                <input type="text" name="text-field" id="envName" value="" data-type="text" placeholder="Drugs">
-                <div class="button textButton" data-function="executeAddEnvelope">Create</div>
-            </div>
-        </div>
-        `
-    }
-    else if( content == `envelopes` ){
-        t.innerHTML = `
-        <div class="closeModal" data-function="toggleModal"></div>
-            Manage your envelopes here.</p>
-            <div class="envelopesDisp" id="envelopesDisp"></div>
-            <div class="inputGroup">
-                <div class="button textButton" data-function="saveEnvelopes">Save</div>
-            </div>
-        </div>
-        `
-        setTimeout(() => { populateEnvelopes(); }, 0);
-    }
-    else if( content == `endMonth` ){
-        t.innerHTML = `
-        <div class="closeModal" data-function="toggleModal"></div>
-            You're about to end the current month.</p>
-            This can't be undone - are you sure?</p>
-            <div class="inputGroup">
-                <div class="button textButton" data-function="endCurrentMonth">Yep!</div>
-            </div>
-        </div>
-        `
-    }
-    else if( content == `resetIncome` ){
-        t.innerHTML = `
-        <div class="closeModal" data-function="toggleModal"></div>
-            You want to reset all the income back to zero?</p>
-            <div class="inputGroup">
-                <div class="button textButton" data-function="resetAllIncome">Yep!</div>
-                <div class="button textButton" data-function="closeModal">Nuh uh!</div>
-            </div>
-        </div>
-        `
-    }
-}
-
-function populateEnvelopes(){
-    let t = document.getElementById( `envelopesDisp` );
-    for( const key in env ){
-        if( env.hasOwnProperty(key) ){
-            if( key !== `envelope0` ){
-                const row = document.createElement('div');
-                let h = env[key].active ? "hide" : "unhide";
-                row.classList = `envRow`;
-                row.setAttribute( `value-env`, key );
-                row.innerHTML = `
-                    <input class="envInput" type="text" id="${key}" name="${key}" value="${env[key].display}">
-                    <div data-function="${ h }" class="${ h }"></div>
-                `
-                t.appendChild(row);
+            if( state.target.x == x && state.target.y == y ){
+                state.target = { x: null, y: null }
             }
         }
     }
 }
 
-function hideEnv( t ){
-    t.setAttribute( `data-function`, `unhide` );
-    t.classList = `unhide`;
-}
-
-function unhideEnv( t ){
-    t.setAttribute( `data-function`, `hide` );
-    t.classList = `hide`;
-}
-
-function updateDropDowns(){
-    let t = document.getElementById( `fromEnv` );
-    for( const key in env ){
-        if( env.hasOwnProperty(key) ){
-            const option = document.createElement('option');
-            option.value = key;
-            option.text = env[key].display;
-            t.appendChild(option);
-        }
-    }
-    t = document.getElementById( `toEnv` );
-    if( t !== null ){
-        for( const key in env ){
-            if( env.hasOwnProperty(key) ){
-                const option = document.createElement('option');
-                option.value = key;
-                option.text = env[key].display;
-                t.appendChild( option );
+function mine(){
+    if( state.target.x !== null && state.target.y !== null ){
+        let a = board[`l${state.l}`][`x${state.target.x}`][`y${state.target.y}`];
+        if( !a.gone && a.seen ){
+            a.wear += getAmount();
+            if( a.wear >= types[a.type].tough ){
+                bustBlock( state.target.x, state.target.y, true );
+            }
+            else{
+                addCrack( state.target.x, state.target.y );
             }
         }
     }
-    if( temp.from !== null ){
-        document.getElementById( `fromEnv` ).value = temp.from;
+}
+
+function addCrack( x, y ){
+    let a = document.querySelector(`[data-x="${x}"][data-y="${y}"]`);
+    let c = document.createElement(`div`);
+    c.classList = `crack${ Math.floor( Math.random() * 4 ) }`;
+    c.style.transform = `rotate(${ Math.floor( Math.random() * 4 ) * 90 }deg)`
+    a.children[0].appendChild(c);
+}
+
+function bustBlock( x, y, yield ){
+    let a = board[`l${state.l}`][`x${x}`][`y${y}`];
+    a.gone = true;
+    let b = document.querySelector(`[data-x="${x}"][data-y="${y}"]`)
+    b.classList.add(`destroyed`);
+    b.innerHTML = ``;
+    if( yield ){ gainRes( a.type ) };
+    reveal( getNeighbours( x, y, true ) );
+    if( state.miner.pos !== undefined ){ moveMiner( x, y, false ); }
+}
+
+function reveal( arr ){
+    for( i in arr ){
+        board[`l${state.l}`][`x${arr[i].x}`][`y${arr[i].y}`].seen = true;
+        let b = document.querySelector(`[data-x="${arr[i].x}"][data-y="${arr[i].y}"]`);
+        if( b.classList.contains(`destroyed`) ){}
+        else{
+            b.children[0].children[0].classList.remove(`fow`);
+        }
     }
 }
 
-function niceNumber( amt ){
-    let isNegative = amt < 0;
-    const absoluteAmt = Math.abs(amt).toFixed(2); // Ensure two decimal places
-    if (parseFloat( absoluteAmt ) == 0) {
-        isNegative = false;
+function moveMiner( x, y, initial ){
+    let legacy = document.querySelector(`.minerCell`);
+    if( legacy !== null ){ legacy.parentElement.removeChild( legacy ); }
+    let target = document.querySelector(`[data-x="${x}"][data-y="${y}"]`);
+    if( initial ){
+        state.miner.pos = { x: x, y: y };
+        state.miner.dir = { x: 0, y: 1 };
+        target.appendChild( minerDiv() );
     }
-    // Split the amount into dollars and cents
-    const parts = absoluteAmt.split('.');
-    // Format the dollars part with commas
-    parts[0] = parts[0].toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-    // Join the parts back together
-    const formattedAmt = parts.join('.');
-    return (isNegative ? "-$" : "$") + formattedAmt;
-}
-
-function saveData() {
-    const data = {
-        fund: fund,
-        env: env
-    };
-    localStorage.setItem('financeData', JSON.stringify(data));
-}
-
-function loadData() {
-    const data = localStorage.getItem('financeData');
-    if (data) {
-        const parsedData = JSON.parse(data);
-        fund = parsedData.fund;
-        env = parsedData.env;
+    else{
+        // let old = document.querySelector(`[data-x="${state.miner.pos.x}"][data-y="${state.miner.pos.y}"]`);
+        // slide from prior pos + animation delay
+        state.miner.old = { x: state.miner.pos.x, y: state.miner.pos.y }
+        state.miner.pos = { x: x, y: y };
+        if( state.miner.dir.x == 1 ){
+            state.miner.dir.x = 0;
+            if( state.miner.pos.y == 0 ){ state.miner.dir.y = 1; }
+            else{ state.miner.dir.y = -1 }
+        }
+        else{
+            if( state.miner.pos.y == 0 || state.miner.pos.y == state.y - 1 ){ state.miner.dir = { x: 1, y: 0 } }            
+        }
+        target.appendChild( minerDiv() );
+        doAnim( true );
+        shiftInnards();
+    }
+    state.target = { x: mineTarget().x, y: mineTarget().y };
+    if( state.miner.pos.x >= state.x - state.thresh ){
+        addRows( state.l, state.thresh );
+        shiftField( state.thresh );
+        setTimeout(() => {
+            killRows( state.l, state.thresh );
+        }, state.delay );
     }
 }
 
+function doAnim( on ){
+    let t = document.querySelector(`.miner`);
+    if( on ){
+        state.anim = true;
+        let doing = `walking`;
+        if( ( state.miner.pos.x - state.miner.old.x ) == 1 ){ doing = `falling`; }
+        t.classList.add( doing );
+    }
+    else{
+        state.anim = false;
+        t.classList.remove(`walking`);
+        t.classList.remove(`falling`);
+    }
+}
 
-/*
-<div class="modal">This will end the current month and roll your envelope balances forward to a fresh month.<p>Are you sure you want to do this?
-    <div class="buttonBox">
-        <div class="button" data-button="closeModal">Whoops!</div>
-        <div class="button" data-button="newMonth">Yep!</div>
-    </div>
-</div>
-*/
+function mineTarget(){
+    let o = {};
+    o.x = state.miner.pos.x + state.miner.dir.x;
+    o.y = state.miner.pos.y + state.miner.dir.y;
+    return o;
+}
+
+function gainRes( a ){
+    inventory[a]++;
+    let div = document.querySelector(`[data-type=${a}]`);
+    div.classList.remove(`noDisplay`);
+    div.children[1].innerHTML = inventory[a];
+}
+
+function getAmount(){
+    return 1;
+}
+
+function buildBoard( l, y ){
+    let e = document.querySelector(`#board`);
+    e.innerHTML = ``;    
+    let b = document.querySelector(`body`).getBoundingClientRect();
+    let x = Math.ceil( Math.ceil( b.height / 16 ) / 5 );
+    state.y = y;
+    state.l = l;
+    board[`l${l}`] = {};
+    addRows( 0, x );
+    setTimeout(() => {
+        bustBlock( 0, 0, false );
+        moveMiner( 0, 0, true );
+    }, 50);    
+}
+
+function addRows( l, n ){
+    state.x += n;
+    let seeds = [];
+    for( let i = 0; i < n; i++ ){
+        let x = state.x - n + i;
+        board[`l${l}`][`x${x}`] = {};
+        for( let j = 0; j < state.y; j++ ){
+            board[`l${l}`][`x${x}`][`y${j}`] = {
+                type: res()
+                , wear: 0
+                , gone: false
+                , seen: false
+            }
+            if( board[`l${l}`][`x${x}`][`y${j}`].type !== `stone` ){
+                seeds.push( { x: x, y: j } );
+            }
+        }
+    }    
+    buildVeins( seeds );
+    buildBoardUI( n );
+}
+
+function buildVeins( s ){
+    for( i in s ){
+        let x = s[i].x, y = s[i].y;
+        let t = board[`l${state.l}`][`x${x}`][`y${y}`];
+        let v = types[t.type].vein;
+        for( let j = 0; j < v; j++ ){
+            let n = getNeighbours( x, y, false );
+            let q = Math.floor( Math.random() * n.length );
+            if( checkBlock( state.l, n[q].x, n[q].y ).type == `stone` ){
+                board[`l${state.l}`][`x${n[q].x}`][`y${n[q].y}`].type = t.type;
+            }
+            else{ break; }
+        }
+    }
+}
+
+function buildBoardUI( n ){
+    let b = document.querySelector(`#board`);
+    for( let i = 0; i < n; i++ ){
+        let r = document.createElement(`div`);
+        r.classList.add(`row`);
+        r.setAttribute(`id`,`r${state.x - n + i}`)
+        for( let j = 0; j < state.y; j++ ){
+            r.appendChild( makeTile( board[`l${state.l}`][`x${state.x - n + i}`][`y${j}`].type, state.x - n + i, j ) );
+        }
+        b.appendChild(r);
+    }
+}
+
+function killRows( l, n ){
+    let start = p( document.querySelector(`#board`).children[0].children[0].getAttribute(`data-x`) );
+    for( let i = 0; i < n; i++ ){
+        let kill = document.querySelector(`#r${start + i}`);
+        kill.parentElement.removeChild( kill );
+        delete board[`l${l}`][`x${start + i}`];
+        document.querySelector(`#board`).style = `transition: none; transform: none`;
+    }
+}
+
+function shiftField( n ){
+    let rem = n * 5;
+    document.querySelector(`#board`).style = `transition: transform ${state.delay}ms; transform: translateY(-${rem}rem)`;
+}
+
+function buildBar(){
+    let a = document.querySelector(`#topBar`);    
+    for( key in types ){
+        let b = document.createElement(`div`);
+        b.classList = `topBox noDisplay`;
+        b.setAttribute(`data-type`,key);
+        let c = document.createElement(`div`);
+        c.classList = `img ${key}-l`;
+        let d = document.createElement(`div`);
+        d.classList = `topCount`;
+        d.innerHTML = `-`;
+        b.appendChild(c);
+        b.appendChild(d);
+        a.appendChild(b);
+    }
+}
+
+function res(){
+    let output = ``;
+    let nonce = Math.random();
+    let sc = 0;
+    for( key in types ){
+        sc += types[key].chance;
+        if( nonce < sc ){
+            output = key;
+            break;
+        }
+    }
+    return output;
+}
+
+function getNeighbours( x, y, cardinal ){
+    let min = 0, xMax = state.x, yMax = state.y;
+    let o = [];
+    for( let m = -1; m <= 1; m++ ){
+        for( let n = -1; n <= 1; n++ ){
+            if( x + m >= min && x + m < xMax ){
+                if( y + n >= min && y + n < yMax ){
+                    if( cardinal ){
+                        if( m == 0 || n == 0 ){
+                            o.push( { x: x + m, y: y + n } );
+                        }
+                    }
+                    else{
+                        o.push( { x: x + m, y: y + n } );
+                    }
+                }
+            }
+        }
+    }
+    return o;
+}
+
+function checkBlock( l, x, y ){
+    return board[`l${l}`][`x${x}`][`y${y}`];
+}
+
+function makeTile( type, x, y ){
+    let o = document.createElement(`div`);
+    o.classList.add( `tile` );
+    o.classList.add( type );
+    o.setAttribute(`data-x`, x );
+    o.setAttribute(`data-y`, y );
+    o.innerHTML = `<div class="tileObs"><div class="fow"></div></div>`;
+    return o;
+}
+
+function minerDiv(){
+    let b = document.createElement(`div`);
+    b.classList = `minerCell`;
+    let yChange = state.miner.pos.y - state.miner.old.y;
+    let dir = `right`;
+    if( yChange == 1 ){ dir = `right`}
+    else if( yChange == -1 ){ dir = `left` }
+    else if( yChange == 0 && state.miner.pos.y == 0 ){ dir = `right` }
+    else if( yChange == 0 ){ dir = `left` }
+    let o = document.createElement(`div`);
+    o.classList = `miner ${dir}`;
+    o.style = `left: 0rem; top: 0.75rem;`
+    b.appendChild(o);
+    return b;
+}
+
+function shiftInnards(){
+    let m = document.querySelector(`.minerCell`);
+    let shiftX = ( state.miner.pos.y - state.miner.old.y ) * -5;
+    let shiftY = ( state.miner.pos.x - state.miner.old.x ) * -5;
+    m.style = `transition: none;
+        transform: translateX(${shiftX}rem) translateY(${shiftY}rem);`;
+    setTimeout(() => {
+        m.style = `transition: transform ${state.tickTime * 2 - 50}ms;
+            transform: translateX(0rem) translateY(0rem);`;
+    }, 50 );
+}
+
+function p( x ){
+    return parseInt( x.replace(/\D/g,'') );
+}
 
 
-/*
+// variables
 
-Set Long Term Savings ?
+var state = {
+    x: 0
+    , y: 0
+    , l: 0
+    , target: { x: null, y: null }
+    , miner: { old: {x: 0, y: 0 } }
+    , tickTime: 600
+    , thresh: 5
+    , anim: false
+    , delay: 5000
+}
 
-Add Income modal - Throws the balance into Savings for that Month
+var board = {
+    l0: {
+        x0: {
+            y0: {}
+        }
+    }
+}
 
-Transfer Balance modal - Moves money between envelopes
-- Shortcut to create new envelope directly from this screen with a starting balance?
-- Option to either "top up to" or "add funds to"
+var types = {
+    emerald: { tough: 50, chance: 0.0005, vein: 0 }
+    , ruby: { tough: 30, chance: 0.0005, vein: 0 }
+    , diamond: { tough: 25, chance: 0.001, vein: 0 }
+    , gold: { tough: 10, chance: 0.002, vein: 1 }
+    , iron: { tough: 20, chance: 0.004, vein: 3 }
+    , coal: { tough: 10, chance: 0.008, vein: 5 }
+    , stone: { tough: 5, chance: 1, vein: 0 }
+}
 
-Manage Envelopes modal - Close an Envelope (what do with balance ?)
-- Other method to add a new envelope with zero balance
+var inventory = {
+    stone: 0
+    , coal: 0
+    , iron: 0
+    , gold: 0
+    , ruby: 0
+    , emerald: 0
+    , diamond: 0
+}
 
-End Month logic - roll over balance to new month of everything but savings
-Take the residual savings and put them into long term then zero savings ready for new income
+var pick = {
 
-Save and Load
-- On Load, if nothing to load, modal asking for the balance to start outside of monthly savings
-
-Dollars only, or cents too?
-
-Can you tranfer balance leaving you with negative?
-Cents Matter
+}
 
 
-Pie chart that shows spending per envelope per month over time
 
-Individual expenses is useful
-
-cannot spend out of unallocated
-
-*/
+function splice( arr1, arr2 ){
+    let newGenome = {}
+    for( g in genome ){
+        let dom1 = arr1.dominance[g];
+        let dom2 = arr2.dominance[g];
+        let stat1 = arr1.base[g];
+        let stat2 = arr2.base[g];
+        let domNonce = Math.floor( Math.random() * dom1 + dom2 )
+        if( domNonce <= dom1 ){ newGenome[g] = stat1; }
+        else{ newGenome[g] = stat2; }
+    }
+    return newGenome;
+}
