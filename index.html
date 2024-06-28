@@ -3,15 +3,49 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script src="./code.js"></script>
     <link rel="stylesheet" href="style.css">
+    <script src="code.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cutive+Mono&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Lexend+Deca&display=swap" rel="stylesheet">
-    <title>Zen Mine</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cutive+Mono&family=Lexend+Deca:wght@100..900&display=swap" rel="stylesheet">
+    <title>Dean's Finances</title>
 </head>
 <body>
-    <section class="topBar" id="topBar"></section>
-    <main class="board" id="board"></main>
+    <main id="main">
+        <section class="bar" id="topBalance">
+            <div class="segment green" id="income" data-function="resetIncome">$0.00</div>
+            <div class="segment red" id="outcome">$0.00</div>
+            <div class="segment white" id="balance">$0.00</div>
+        </section>
+        <section class="middle" id="middle">
+            <div class="modalShade noDisplay" id="modalShade">
+                <div class="modal" id="modal"></div>
+            </div>
+            <div id="envelopeBody">
+                <div class="middleLabel">Envelopes</div>
+            </div>
+            <div id="incomeBody">
+                <div class="middleLabel">Income</div>
+            </div>
+        </section>
+        <section class="bar" id="bottomButtons">
+            <div class="segment bottomChunk" data-function="addExpense">
+                <div class="text">Expense</div>
+                <div class="mainButton" id="addExpense"></div>
+            </div>
+            <div class="segment bottomChunk" data-function="addSalary">
+                <div class="text">Income</div>
+                <div class="mainButton" id="addSalary"></div>
+            </div>
+            <div class="segment bottomChunk" data-function="envelopes">
+                <div class="text">Envelopes</div>
+                <div class="mainButton" id="envelopes"></div>
+            </div>
+            <div class="segment bottomChunk" data-function="endMonth">
+                <div class="text">End Month</div>
+                <div class="mainButton" id="endMonth"></div>
+            </div>
+        </section>
+    </main>
 </body>
 </html>
