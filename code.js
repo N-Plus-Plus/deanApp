@@ -387,20 +387,24 @@ function updateDropDowns(){
     let t = document.getElementById( `fromEnv` );
     for( const key in env ){
         if( env.hasOwnProperty(key) ){
-            const option = document.createElement('option');
-            option.value = key;
-            option.text = env[key].display;
-            t.appendChild(option);
+            if( env[key].active ){
+                const option = document.createElement('option');
+                option.value = key;
+                option.text = env[key].display;
+                t.appendChild(option);
+            }
         }
     }
     t = document.getElementById( `toEnv` );
     if( t !== null ){
         for( const key in env ){
             if( env.hasOwnProperty(key) ){
-                const option = document.createElement('option');
-                option.value = key;
-                option.text = env[key].display;
-                t.appendChild( option );
+                if( env[key].active ){
+                    const option = document.createElement('option');
+                    option.value = key;
+                    option.text = env[key].display;
+                    t.appendChild( option );
+                }
             }
         }
     }
@@ -439,6 +443,10 @@ function loadData() {
         fund = parsedData.fund;
         env = parsedData.env;
     }
+}
+
+function loadThis( x ){
+
 }
 
 
