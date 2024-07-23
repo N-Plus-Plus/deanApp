@@ -148,10 +148,11 @@ function updateEnvelopes(){
         if( env[`envelope${i}`].active ){
             let available = env[`envelope${i}`].starting + env[`envelope${i}`].added;
             let consumed = env[`envelope${i}`].spent;
+            // <div class="title">${env[`envelope${i}`].display}</div>
             t.innerHTML += `
                 <div class="row">
                     <div class="title">${env[`envelope${i}`].display}</div>
-                    <div class="rowSegment green">${ niceNumber( available ) }</div>
+                    <div class="rowSegment green">${ niceNumber( env[`envelope${i}`].added ) }</div>
                     <div class="rowSegment red">${ niceNumber( consumed ) }</div>
                     <div class="rowSegment white">${ niceNumber( available - consumed ) }</div>
                     <div class="transfer" data-function="transferFunds" data-discriminator="${`envelope${i}`}"></div>
