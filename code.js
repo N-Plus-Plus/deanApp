@@ -6,7 +6,6 @@ function onLoad(){
     // buildModal(`firstLaunch`);
     // toggleModal();
     loadData();
-    updateDisplay();
 }
 
 function clicked( e ){
@@ -429,22 +428,133 @@ function niceNumber( amt ){
     return (isNegative ? "-$" : "$") + formattedAmt;
 }
 
-function saveData() {
-    const data = {
-        fund: fund,
-        env: env
-    };
-    localStorage.setItem('financeData', JSON.stringify(data));
+// function saveData() {
+//     const data = {
+//         fund: fund,
+//         env: env
+//     };
+//     localStorage.setItem('financeData', JSON.stringify(data));
+// }
+
+// function loadData() {
+//     const data = localStorage.getItem('financeData');
+//     if (data) {
+//         const parsedData = JSON.parse(data);
+//         fund = parsedData.fund;
+//         env = parsedData.env;
+//     }
+// }
+
+// Initialize IndexedDB
+function initDB() {
+    return new Promise((resolve, reject) => {
+        const request = indexedDB.open('FinanceAppDB', 1);
+
+        request.onupgradeneeded = function(event) {
+            const db = event.target.result;
+            // Create an object store named 'financeDataStore' with 'id' as the key path
+            if (!db.objectStoreNames.contains('financeDataStore')) {
+                db.createObjectStore('financeDataStore', { keyPath: 'id' });
+            }
+        };
+
+        request.onsuccess = function(event) {
+            const db = event.target.result;
+            resolve(db);
+        };
+
+        request.onerror = function(event) {
+            console.error('IndexedDB initialization error:', event.target.errorCode);
+            reject(event.target.error);
+        };
+    });
 }
 
-function loadData() {
-    const data = localStorage.getItem('financeData');
-    if (data) {
-        const parsedData = JSON.parse(data);
-        fund = parsedData.fund;
-        env = parsedData.env;
+let dbPromise = initDB();
+
+function getDB() {
+    return dbPromise;
+}
+
+async function saveData() {
+    const db = await getDB();
+    return new Promise((resolve, reject) => {
+        const transaction = db.transaction(['financeDataStore'], 'readwrite');
+        const store = transaction.objectStore('financeDataStore');
+
+        const data = {
+            id: 'financeData', // Unique identifier for the data
+            fund: fund,
+            env: env
+        };
+
+        const request = store.put(data); // 'put' will add or update the record
+
+        request.onsuccess = function() {
+            console.log('Data successfully saved to IndexedDB.');
+            resolve();
+        };
+
+        request.onerror = function(event) {
+            console.error('Error saving data to IndexedDB:', event.target.error);
+            reject(event.target.error);
+        };
+    });
+}
+
+async function loadData() {
+    const db = await getDB();
+    return new Promise((resolve, reject) => {
+        const transaction = db.transaction(['financeDataStore'], 'readonly');
+        const store = transaction.objectStore('financeDataStore');
+
+        const request = store.get('financeData'); // Retrieve the record with id 'financeData'
+
+        request.onsuccess = function(event) {
+            const data = event.target.result;
+            if (data) {
+                fund = data.fund;
+                env = data.env;
+                console.log('Data successfully loaded from IndexedDB.');
+            } else {
+                console.log('No data found in IndexedDB.');
+            }
+            resolve(data);
+            updateDisplay();
+        };
+
+        request.onerror = function(event) {
+            console.error('Error loading data from IndexedDB:', event.target.error);
+            reject(event.target.error);
+        };
+    });
+}
+
+// Example usage of saveData
+async function handleSave() {
+    try {
+        await saveData();
+        alert('Data saved successfully!');
+    } catch (error) {
+        alert('Failed to save data.');
     }
 }
+
+// Example usage of loadData
+async function handleLoad() {
+    try {
+        await loadData();
+        // Update your UI or perform other actions with the loaded data
+    } catch (error) {
+        alert('Failed to load data.');
+    }
+}
+
+// Call loadData when the app initializes
+document.addEventListener('DOMContentLoaded', () => {
+    handleLoad();
+});
+
 
 function loadThis( x ){
 
